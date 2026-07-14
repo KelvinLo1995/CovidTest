@@ -2,27 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive COVID-19 Antigen Test Simulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Realistic COVID-19 Antigen Test Simulator</title>
     <!-- Loading Tailwind CSS & Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
-            touch-action: none; /* Disables default touch scrolling during interactions */
+            overflow-x: hidden; /* Prevents side-scrolling entirely */
         }
         .cassette-body {
             background: linear-gradient(145deg, #ffffff, #e6ebf0);
-            box-shadow: 10px 10px 20px #d1d9e6, -10px -10px 20px #ffffff;
+            box-shadow: 6px 6px 12px #d1d9e6, -6px -6px 12px #ffffff;
         }
         .sample-well-inner {
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.15), inset -2px -2px 5px rgba(255,255,255,0.8);
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.15), inset -1px -1px 3px rgba(255,255,255,0.8);
         }
         .strip-window {
-            box-shadow: inset 2px 2px 6px rgba(0,0,0,0.12);
+            box-shadow: inset 1px 1px 4px rgba(0,0,0,0.12);
         }
         /* Capillary liquid wicking animation */
         @keyframes wicking {
@@ -45,7 +45,7 @@
             height: 100%;
             pointer-events: none;
             z-index: 50;
-            transition: opacity 1.5s ease;
+            transition: opacity 1.2s ease;
         }
         .fade-out {
             opacity: 0 !important;
@@ -53,194 +53,184 @@
         /* Custom pulsing target glowing effect */
         @keyframes target-pulse {
             0%, 100% { transform: scale(1); opacity: 0.4; }
-            50% { transform: scale(1.15); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
         .glow-ring {
             animation: target-pulse 2s infinite ease-in-out;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-3">
 
-    <div class="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden p-6 border border-gray-100">
+    <!-- Compact Main Container (Highly optimized heights to fit iOS viewports) -->
+    <div class="relative w-full max-w-sm bg-white rounded-2xl shadow-xl overflow-hidden p-4 border border-gray-100 flex flex-col justify-between">
         
         <!-- Canvas for Celebration Confetti -->
         <canvas id="confetti-canvas" class="opacity-100"></canvas>
 
-        <!-- Header -->
-        <div class="text-center mb-5">
-            <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full uppercase tracking-wider mb-2">Virtual Lab Deck</span>
-            <h1 class="text-2xl font-bold text-gray-800">Rapid Antigen COVID-19 Test</h1>
-            <p id="sub-instruction" class="text-sm text-gray-500 mt-1">Ready to start? Tap the button in the interaction area below!</p>
+        <!-- Header (Extremely Compact) -->
+        <div class="text-center mb-3">
+            <span class="inline-block px-2.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full uppercase tracking-wider mb-1">Virtual Lab Deck</span>
+            <h1 class="text-lg font-bold text-gray-800">SARS-CoV-2 Antigen Test</h1>
+            <p id="sub-instruction" class="text-[11px] text-gray-400 mt-0.5">Press start inside the panel below.</p>
         </div>
 
-        <!-- Interactive Playground (Enlarged interaction area) -->
-        <div id="playground" class="bg-slate-50 rounded-2xl p-4 min-h-[380px] flex flex-col items-center justify-center border border-dashed border-slate-200 relative overflow-hidden mb-6 select-none">
+        <!-- Interactive Playground (Strictly absolute bounded sandbox area) -->
+        <div id="playground" class="bg-slate-50 rounded-xl min-h-[250px] border border-dashed border-slate-200 relative overflow-hidden mb-3 select-none touch-none">
             
-            <!-- STAGE 0: Ready To Begin (With direct, integrated Start Button) -->
-            <div id="stage-0" class="text-center flex flex-col items-center justify-center py-6">
-                <svg class="w-20 h-20 mb-4 text-blue-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- STAGE 0: Ready To Begin -->
+            <div id="stage-0" class="absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4 text-center">
+                <svg class="w-12 h-12 mb-2 text-blue-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
                 </svg>
-                <p class="font-bold text-lg text-gray-700">Rapid Testing Chamber</p>
-                <p class="text-xs text-gray-400 mt-1 mb-6">Learn step-by-step with an interactive simulation</p>
+                <p class="font-bold text-sm text-gray-700">Rapid Testing Chamber</p>
+                <p class="text-[10px] text-gray-400 mt-0.5 mb-4">Tactile step-by-step simulator</p>
                 
-                <!-- STAGE 0 DIRECT TRIGGER ACTION -->
-                <button onclick="startWorkflow()" class="px-8 py-4 rounded-2xl font-bold text-white bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-500/30 text-center cursor-pointer animate-pulse">
+                <button onclick="startWorkflow()" class="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-500/30 text-center cursor-pointer animate-pulse">
                     Start Virtual Test
                 </button>
             </div>
 
             <!-- STAGE 1: Swabbing -->
-            <div id="stage-1" class="hidden w-full h-full relative flex flex-col items-center justify-center">
-                <!-- Enlarged Nostril Graphic container -->
-                <div id="nose-box" class="relative w-64 h-48 flex items-center justify-center border border-slate-100 bg-white/60 rounded-2xl shadow-sm">
+            <div id="stage-1" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center">
+                <div id="nose-box" class="relative w-48 h-32 flex items-center justify-center border border-slate-100 bg-white/60 rounded-xl shadow-sm mt-2">
                     <!-- Nostril Outline -->
-                    <svg class="w-44 h-44 text-pink-300 absolute pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
+                    <svg class="w-28 h-28 text-pink-300 absolute pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
                         <path d="M25 50 c0-15 10-25 25-25 s25 10 25 25 c0 15-8 15-25 15 s-25 0-25-15" opacity="0.3"/>
                         <circle id="nostril-l-visual" cx="36" cy="52" r="14" fill="#3a1c1c" class="transition-colors duration-200" />
                         <circle id="nostril-r-visual" cx="64" cy="52" r="14" fill="#3a1c1c" class="transition-colors duration-200" />
                     </svg>
 
-                    <!-- Interactive Overlap Target Hitboxes for Nostrils (Scaled Up) -->
-                    <div id="hitbox-nostril-l" class="absolute w-12 h-12 rounded-full border-2 border-dashed border-sky-400 glow-ring" style="top: 76px; left: calc(50% - 44px); pointer-events: none;"></div>
-                    <div id="hitbox-nostril-r" class="absolute w-12 h-12 rounded-full border-2 border-dashed border-sky-400 glow-ring" style="top: 76px; left: calc(50% + 12px); pointer-events: none;"></div>
-                </div>
+                    <!-- Interactive Overlap Target Hitboxes -->
+                <div id="hitbox-nostril-l" class="absolute w-10 h-10 rounded-full border-2 border-dashed border-sky-400 glow-ring" style="top: 48px; left: calc(50% - 28px); pointer-events: none;"></div>
+                <div id="hitbox-nostril-r" class="absolute w-10 h-10 rounded-full border-2 border-dashed border-sky-400 glow-ring" style="top: 48px; left: calc(50% + 4px); pointer-events: none;"></div>
+            </div>
 
-                <!-- Absolute Swab Stick (Scaled Up) -->
-                <div id="swab-stick" class="absolute w-3 h-32 bg-amber-100 border-l border-r border-amber-200 rounded-b-full cursor-grab active:cursor-grabbing transition-shadow duration-100" style="bottom: 15px; left: calc(50% - 6px); z-index: 20;">
-                    <!-- Swab Tip (Scaled Up) -->
-                    <div id="swab-tip" class="absolute -top-6 -left-2 w-7 h-8 bg-white rounded-t-full border border-gray-200 shadow-sm"></div>
+            <!-- Swab Stick Wrapper (Expanded touch area) -->
+            <div id="swab-stick-wrapper" class="absolute w-16 h-32 cursor-grab active:cursor-grabbing flex flex-col items-center justify-start select-none touch-none" style="top: 130px; left: calc(50% - 32px); z-index: 20; touch-action: none;">
+                <!-- Soft Cotton Swab Tip -->
+                <div id="swab-tip" class="w-5 h-6 bg-white rounded-full border border-gray-200 shadow-sm z-10 relative"></div>
+                <!-- Wooden Shaft (Fixed: using valid Tailwind h-20 class) -->
+                <div class="w-2 h-20 bg-amber-100 border-l border-r border-amber-300 rounded-b-full -mt-1 relative z-0"></div>
+            </div>
+        </div>
+
+        <!-- STAGE 2: Mixing Swab in Tube -->
+        <div id="stage-2" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center">
+            <div id="mixing-box" class="relative w-48 h-32 flex justify-center items-end border border-slate-100 bg-white/60 rounded-xl overflow-hidden shadow-sm mt-2">
+                <div id="buffer-tube" class="relative w-14 h-24 bg-blue-50 bg-opacity-40 border-2 border-blue-200 rounded-b-2xl overflow-hidden flex items-end mb-1">
+                    <div id="tube-fluid" class="w-full h-12 bg-blue-300 bg-opacity-60 relative transition-transform duration-150 origin-bottom"></div>
+                    <div id="hitbox-fluid" class="absolute bottom-0 w-full h-12 border border-dashed border-blue-400 glow-ring" style="pointer-events: none;"></div>
                 </div>
             </div>
 
-            <!-- STAGE 2: Mixing Swab in Tube -->
-            <div id="stage-2" class="hidden w-full h-full relative flex flex-col items-center justify-center">
-                <div id="mixing-box" class="relative w-64 h-48 flex justify-center items-end border border-slate-100 bg-white/60 rounded-2xl overflow-hidden shadow-sm">
-                    <!-- Buffer Fluid Tube Container (Scaled Up) -->
-                    <div id="buffer-tube" class="relative w-20 h-40 bg-blue-50 bg-opacity-40 border-2 border-blue-200 rounded-b-3xl overflow-hidden flex items-end mb-1">
-                        <!-- Fluid Level -->
-                        <div id="tube-fluid" class="w-full h-20 bg-blue-300 bg-opacity-60 relative transition-transform duration-150 origin-bottom"></div>
-                        
-                        <!-- Invisible overlap collision region of the fluid (Scaled Up) -->
-                        <div id="hitbox-fluid" class="absolute bottom-0 w-full h-20 border border-dashed border-blue-400 glow-ring" style="pointer-events: none;"></div>
-                    </div>
-                </div>
-
-                <!-- Swab stick used for stirring (Scaled Up) -->
-                <div id="tube-swab" class="absolute w-3 h-32 bg-amber-100 border border-amber-200 rounded-b-full cursor-grab active:cursor-grabbing" style="top: 15px; left: calc(50% - 6px); z-index: 20;">
-                    <!-- Cotton Stir Tip at the Bottom -->
-                    <div id="vial-swab-tip" class="absolute -bottom-3 -left-1.5 w-6 h-8 bg-gray-100 rounded-b-full border border-gray-300"></div>
-                </div>
+            <!-- Stirring Swab Wrapper (Expanded touch area) -->
+            <div id="tube-swab-wrapper" class="absolute w-16 h-32 cursor-grab active:cursor-grabbing flex flex-col items-center justify-end select-none touch-none" style="top: 10px; left: calc(50% - 32px); z-index: 20; touch-action: none;">
+                <!-- Wooden Shaft (Fixed: using valid Tailwind h-20 class) -->
+                <div class="w-2 h-20 bg-amber-100 border border-amber-300 rounded-t-full relative z-0 -mb-1"></div>
+                <!-- Specimen-Laden Swab Tip inside solution -->
+                <div id="vial-swab-tip" class="w-5 h-6 bg-gray-100 rounded-full border border-gray-300 shadow-sm z-10 relative"></div>
             </div>
+        </div>
 
-            <!-- STAGE 3: Squeezing Drops -->
-            <div id="stage-3" class="hidden text-center w-full">
-                <div class="relative w-64 h-44 mx-auto flex flex-col items-center justify-between">
-                    <!-- Squeezable Tube upside down (Scaled Up) -->
-                    <div id="dripping-tube" class="relative w-12 h-24 bg-blue-50 bg-opacity-70 border-2 border-blue-200 rounded-t-3xl rounded-b-md flex flex-col justify-end items-center cursor-pointer active:scale-95 transition-transform duration-100" style="transform: rotate(180deg);">
-                        <div class="w-full h-12 bg-blue-200 bg-opacity-60 rounded-t-2xl"></div>
-                        <div class="w-3 h-5 bg-gray-300 rounded-b-sm"></div>
+        <!-- STAGE 3: Squeezing Drops -->
+            <div id="stage-3" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4 text-center">
+                <div class="relative w-48 h-32 mx-auto flex flex-col items-center justify-between">
+                    <div id="dripping-tube" class="relative w-10 h-20 bg-blue-50 bg-opacity-70 border-2 border-blue-200 rounded-t-2xl rounded-b-sm flex flex-col justify-end items-center cursor-pointer active:scale-95 transition-transform duration-100" style="transform: rotate(180deg);">
+                        <div class="w-full h-10 bg-blue-200 bg-opacity-60 rounded-t-xl"></div>
+                        <div class="w-2 h-4 bg-gray-300 rounded-b"></div>
                     </div>
-                    <!-- Animated Falling Drop (Scaled Up) -->
-                    <div id="droplet" class="absolute w-4 h-5 bg-blue-400 rounded-full opacity-0" style="top: 80px; border-top-left-radius: 0; transform: rotate(-45deg);"></div>
-                    <div class="text-center mt-2">
-                        <p class="text-sm text-gray-500 font-bold">Tap the buffer tube above to dispense</p>
+                    <!-- Animated Falling Drop -->
+                    <div id="droplet" class="absolute w-3 h-4 bg-blue-400 rounded-full opacity-0" style="top: 60px; border-top-left-radius: 0; transform: rotate(-45deg);"></div>
+                    <div class="text-center">
+                        <p class="text-[11px] text-gray-500 font-bold">Tap buffer tube to dispense</p>
                     </div>
                 </div>
-                <div class="mt-4 flex justify-center gap-3">
-                    <span id="drop-1" class="w-4 h-4 rounded-full bg-gray-300 border border-gray-400"></span>
-                    <span id="drop-2" class="w-4 h-4 rounded-full bg-gray-300 border border-gray-400"></span>
-                    <span id="drop-3" class="w-4 h-4 rounded-full bg-gray-300 border border-gray-400"></span>
+                <div class="mt-3 flex justify-center gap-2">
+                    <span id="drop-1" class="w-3 h-3 rounded-full bg-gray-300 border border-gray-400"></span>
+                    <span id="drop-2" class="w-3 h-3 rounded-full bg-gray-300 border border-gray-400"></span>
+                    <span id="drop-3" class="w-3 h-3 rounded-full bg-gray-300 border border-gray-400"></span>
                 </div>
             </div>
 
             <!-- STAGE 4: Waiting / Reading Strip -->
-            <div id="stage-4" class="hidden text-center w-full">
-                <div class="flex items-center justify-center space-x-2 mb-3">
-                    <div class="w-3.5 h-3.5 bg-blue-600 rounded-full animate-ping"></div>
-                    <span class="text-base font-bold text-blue-600">Developing Test Strip...</span>
+            <div id="stage-4" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4 text-center">
+                <div class="flex items-center justify-center space-x-1.5 mb-2">
+                    <div class="w-2.5 h-2.5 bg-blue-600 rounded-full animate-ping"></div>
+                    <span class="text-xs font-bold text-blue-600">Developing Test Strip...</span>
                 </div>
-                <p class="text-xs text-gray-500 px-6">The buffer solution is wicking up the paper membrane. Please wait for the antibodies to react.</p>
-                <!-- Countdown Progress bar -->
-                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-5 max-w-xs mx-auto overflow-hidden">
-                    <div id="wick-progress" class="bg-blue-600 h-2.5 w-0"></div>
+                <p class="text-[10px] text-gray-400 px-3">Capillary paper membrane is running. Liquid reaction will formulate in about 5 seconds.</p>
+                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-3 max-w-xs mx-auto overflow-hidden">
+                    <div id="wick-progress" class="bg-blue-600 h-1.5 w-0"></div>
                 </div>
             </div>
 
             <!-- STAGE 5: Result Screen -->
-            <div id="stage-5" class="hidden text-center w-full flex flex-col items-center justify-center">
-                <div id="result-badge" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm mb-4">
-                    <span id="badge-dot" class="w-2.5 h-2.5 rounded-full animate-pulse"></span>
+            <div id="stage-5" class="hidden absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4 text-center">
+                <div id="result-badge" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full font-bold text-xs mb-3">
+                    <span id="badge-dot" class="w-2 h-2 rounded-full animate-pulse"></span>
                     <span id="badge-text">Analyzing</span>
                 </div>
-                <p id="result-description" class="text-xs text-gray-500 max-w-xs mx-auto mb-6"></p>
+                <p id="result-description" class="text-[10px] text-gray-400 max-w-xs mx-auto mb-4 px-2"></p>
                 
-                <!-- Repeat directly inside the playground panel -->
-                <button onclick="startWorkflow()" class="px-8 py-4 rounded-2xl font-bold text-white bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-500/30 text-center cursor-pointer">
+                <button onclick="startWorkflow()" class="px-5 py-2 rounded-xl font-bold text-xs text-white bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-500/30 text-center cursor-pointer">
                     Run Another Test
                 </button>
             </div>
 
         </div>
 
-        <div class="flex flex-col items-center justify-center bg-gray-50 py-5 px-4 rounded-2xl border border-gray-100 shadow-inner mb-6">
-            <!-- Cassette Plastic Outer casing -->
-            <div class="cassette-body w-[310px] h-28 rounded-2xl border border-gray-200 flex items-center justify-between px-5 relative overflow-hidden">
-                <!-- Branding Label -->
-                <div class="absolute top-1 left-5 text-[9px] font-bold text-gray-400 tracking-wider">SARS-CoV-2 Ag</div>
+        <!-- Cassette Layout (Optimized & Compacted height to sit on single page) -->
+        <div class="flex flex-col items-center justify-center bg-gray-50 py-3 px-3 rounded-xl border border-gray-100 shadow-inner mb-3">
+            <div class="cassette-body w-[270px] h-20 rounded-xl border border-gray-200 flex items-center justify-between px-3 relative overflow-hidden">
+                <div class="absolute top-1 left-3 text-[8px] font-bold text-gray-400 tracking-wider">SARS-CoV-2 Ag</div>
 
                 <!-- Sample Well (S) -->
                 <div class="flex flex-col items-center justify-center">
-                    <div class="sample-well-inner w-12 h-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center relative overflow-hidden">
-                        <!-- Fluid Level indicator inside well -->
+                    <div class="sample-well-inner w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center relative overflow-hidden">
                         <div id="well-fluid" class="absolute bottom-0 w-full h-0 bg-blue-100 opacity-60 transition-all duration-1000 rounded-b-full"></div>
-                        <!-- Well shape -->
-                        <div class="w-8 h-8 rounded-full border border-gray-300 border-dashed flex items-center justify-center text-[10px] font-bold text-gray-400">S</div>
+                        <div class="w-7 h-7 rounded-full border border-gray-300 border-dashed flex items-center justify-center text-[9px] font-bold text-gray-400">S</div>
                     </div>
                 </div>
 
-                <!-- Direction Arrow -->
-                <div class="text-gray-300 font-bold select-none text-lg">➔</div>
+                <div class="text-gray-300 font-bold select-none text-sm">➔</div>
 
                 <!-- Strip Window Display (C & T lines) -->
-                <div class="strip-window w-28 h-16 bg-white border border-gray-300 rounded flex items-center justify-around relative px-2 overflow-hidden">
-                    <!-- Liquid front running up -->
+                <div class="strip-window w-24 h-12 bg-white border border-gray-300 rounded flex items-center justify-around relative px-1 overflow-hidden">
                     <div id="liquid-front" class="absolute left-0 bottom-0 w-full h-0 bg-blue-50 opacity-0 z-0"></div>
 
                     <!-- Control Region (C) -->
-                    <div class="flex flex-col items-center justify-between h-full py-1 z-10 w-8">
-                        <span class="text-[9px] font-black text-gray-400 select-none">C</span>
-                        <div class="w-1.5 h-8 bg-gray-50 relative flex justify-center">
-                            <div id="control-line" class="test-line absolute top-0 w-full h-full bg-red-600 opacity-0 rounded-sm shadow-sm shadow-red-500/50"></div>
+                    <div class="flex flex-col items-center justify-between h-full py-0.5 z-10 w-7">
+                        <span class="text-[8px] font-black text-gray-400 select-none">C</span>
+                        <div class="w-1 h-6 bg-gray-50 relative flex justify-center">
+                            <div id="control-line" class="test-line absolute top-0 w-full h-full bg-red-600 opacity-0 rounded shadow"></div>
                         </div>
                     </div>
 
                     <!-- Test Region (T) -->
-                    <div class="flex flex-col items-center justify-between h-full py-1 z-10 w-8">
-                        <span class="text-[9px] font-black text-gray-400 select-none">T</span>
-                        <div class="w-1.5 h-8 bg-gray-50 relative flex justify-center">
-                            <div id="test-line" class="test-line absolute top-0 w-full h-full bg-red-600 opacity-0 rounded-sm shadow-sm shadow-red-500/50"></div>
+                    <div class="flex flex-col items-center justify-between h-full py-0.5 z-10 w-7">
+                        <span class="text-[8px] font-black text-gray-400 select-none">T</span>
+                        <div class="w-1 h-6 bg-gray-50 relative flex justify-center">
+                            <div id="test-line" class="test-line absolute top-0 w-full h-full bg-red-600 opacity-0 rounded shadow"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Device Model Details -->
-                <div class="text-[9px] font-bold text-gray-400 tracking-tight self-end mb-1">LOT: 20260714</div>
+                <div class="text-[8px] font-bold text-gray-400 tracking-tight self-end mb-1">LOT: 20260714</div>
             </div>
         </div>
 
-        <!-- Dynamic Lab Assistant guidance replaces the redundant start button -->
-        <div class="border-t border-gray-100 pt-4">
-            <div id="guidance-banner" class="bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-start space-x-3">
-                <div class="bg-blue-100 text-blue-700 p-1.5 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Dynamic Lab Assistant Guidance Banner -->
+        <div class="border-t border-gray-100 pt-2.5">
+            <div id="guidance-banner" class="bg-blue-50 border border-blue-100 rounded-lg p-2 flex items-start space-x-2">
+                <div class="bg-blue-100 text-blue-700 p-1 rounded">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
                 <div>
-                    <h4 class="text-xs font-bold text-blue-800 uppercase tracking-wider">Lab Assistant Guide</h4>
-                    <p id="guidance-text" class="text-xs text-blue-700 mt-0.5">Please press the "Start Virtual Test" button above to prepare your clean equipment deck.</p>
+                    <h4 class="text-[10px] font-bold text-blue-800 uppercase tracking-wider">Assistant</h4>
+                    <p id="guidance-text" class="text-[10px] text-blue-700 mt-0.5">Press 'Start Virtual Test' inside the panel above to begin.</p>
                 </div>
             </div>
         </div>
@@ -254,12 +244,10 @@
         let mixProgressVal = 0;
         let dropletsAdded = 0;
         const targetDroplets = 3;
-        let chosenOutcome = 'negative'; // Randomized on start
+        let chosenOutcome = 'negative';
 
         // Drag State Variables
         let activeDragElement = null;
-        let grabStartX = 0;
-        let grabStartY = 0;
         let originalLeft = 0;
         let originalTop = 0;
         let lastPointerX = 0;
@@ -273,17 +261,17 @@
         let isCelebrating = false;
         let isSpawning = false;
 
-        // Helper guidance configurations for each phase
+        // Assistant Guidance Configurations
         const guides = {
-            0: "Please press the 'Start Virtual Test' button above to prepare your clean equipment deck.",
-            1: "Pro Tip: Guide the cotton-tipped swab stick deeply into both nostrils, rubbing to accumulate antigen cells.",
-            2: "Pro Tip: Dip the sample swab all the way into the buffer solution and stir continuously to mix.",
-            3: "Pro Tip: Squeeze the sample tube to dispense precisely 3 buffer drops into the cassette well designated 'S'.",
-            4: "Pro Tip: Liquid runs up via capillary action. Results become readable in about 5 seconds.",
-            5: "Pro Tip: Review result lines. Consult a clinical provider if you have concerns or persistent symptoms."
+            0: "Press 'Start Virtual Test' inside the panel above to prepare your clean equipment deck.",
+            1: "Pro Tip: Guide the cotton swab into both nostrils, sliding around to collect specimen particles.",
+            2: "Pro Tip: Dip the swab deep into the buffer solution and swirl it around to mix.",
+            3: "Pro Tip: Gently squeeze the sample tube to drop 3 droplets into the cassette well (S).",
+            4: "Pro Tip: Wait for the liquid to wick. Results become legible in about 5 seconds.",
+            5: "Pro Tip: Analyze the result marks. Consult a healthcare practitioner if symptoms persist."
         };
 
-        // Bounding check for element intersections
+        // Collision Helper
         function elementsOverlap(el1, el2) {
             const r1 = el1.getBoundingClientRect();
             const r2 = el2.getBoundingClientRect();
@@ -301,17 +289,17 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Confetti Particle Blueprint
+        // Confetti Particle Class
         class ConfettiParticle {
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * -50 - 20;
-                this.size = Math.random() * 8 + 6;
+                this.size = Math.random() * 6 + 4;
                 this.color = `hsl(${Math.random() * 360}, 90%, 60%)`;
-                this.speedY = Math.random() * 4 + 3;
-                this.speedX = Math.random() * 2 - 1;
+                this.speedY = Math.random() * 3 + 2;
+                this.speedX = Math.random() * 1.5 - 0.75;
                 this.rotation = Math.random() * 360;
-                this.rotationSpeed = Math.random() * 4 - 2;
+                this.rotationSpeed = Math.random() * 3 - 1.5;
             }
             update() {
                 this.y += this.speedY;
@@ -328,23 +316,24 @@
             }
         }
 
-        // Trigger Confetti Loop
+        // Starts spawning confetti on positive result
         function startConfetti() {
             if (isCelebrating) return;
             isCelebrating = true;
             isSpawning = true;
             canvas.classList.remove('fade-out');
             particles = [];
-            for (let i = 0; i < 40; i++) {
+            for (let i = 0; i < 30; i++) {
                 particles.push(new ConfettiParticle());
             }
             animateConfetti();
         }
 
+        // Confetti Animation Loop
         function animateConfetti() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            if (isSpawning && particles.length < 120) {
+            if (isSpawning && particles.length < 80) {
                 if (Math.random() < 0.2) {
                     particles.push(new ConfettiParticle());
                 }
@@ -375,7 +364,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
-        // Gradual Confetti Dismissal (particles finish path)
+        // Dismiss Confetti gracefully
         function dismissConfetti() {
             isSpawning = false;
             canvas.classList.add('fade-out');
@@ -384,10 +373,10 @@
                     stopConfettiEngine();
                     canvas.classList.remove('fade-out');
                 }
-            }, 1500);
+            }, 1200);
         }
 
-        // Change Active Interface Screen
+        // Toggle Stage Visual Panels
         function showStage(stageNum) {
             currentStage = stageNum;
             for (let i = 0; i <= 5; i++) {
@@ -400,14 +389,12 @@
                     }
                 }
             }
-            // Update the guidance card content dynamically
             const guideText = document.getElementById('guidance-text');
             if (guideText && guides[stageNum]) {
                 guideText.innerText = guides[stageNum];
             }
         }
 
-        // Clear All Previous Cassette Visual Marks
         function resetCassetteVisuals() {
             document.getElementById('control-line').style.opacity = '0';
             document.getElementById('test-line').style.opacity = '0';
@@ -419,7 +406,7 @@
             front.style.opacity = '0';
         }
 
-        // Core Stage Reset & Randomization
+        // Resets the environment and initiates a brand new run
         function startWorkflow() {
             const rng = Math.random();
             if (rng < 0.35) {
@@ -433,20 +420,18 @@
             dismissConfetti();
             resetCassetteVisuals();
             
-            // Initialize Stage 1
             swabProgressVal = 0;
             showStage(1);
             
-            // Reset Swab stick to center-bottom (larger position parameters)
-            const swab = document.getElementById('swab-stick');
-            swab.style.left = 'calc(50% - 6px)';
-            swab.style.bottom = '15px';
-            swab.style.top = 'auto';
+            // Adjust coordinates for the new wrapper size
+            const swab = document.getElementById('swab-stick-wrapper');
+            swab.style.left = 'calc(50% - 32px)';
+            swab.style.top = '130px';
 
-            document.getElementById('sub-instruction').innerText = "Hold & drag the swab stick into the nostril targets.";
+            document.getElementById('sub-instruction').innerText = "Drag swab stick into the nostrils.";
         }
 
-        // Fetch Mouse/Touch pointer coordinate positions
+        // Unified Pointer coordinates retriever (iOS and Desktop Safari compliant)
         function getPointerCoords(e) {
             if (e.touches && e.touches.length > 0) {
                 return { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -454,9 +439,9 @@
             return { x: e.clientX, y: e.clientY };
         }
 
-        function setupDragging(dragElementId, stageContainerId, onDragCallback) {
+        // Core Touch / Mouse Dragging setup (Direct Offset properties for iOS safety)
+        function setupDragging(dragElementId, stageContainerId) {
             const el = document.getElementById(dragElementId);
-            const container = document.getElementById(stageContainerId);
 
             function handleStart(e) {
                 if (currentStage === 0 || currentStage >= 3) return;
@@ -465,12 +450,11 @@
                 lastPointerX = coords.x;
                 lastPointerY = coords.y;
 
-                const style = window.getComputedStyle(el);
-                originalLeft = parseFloat(style.left) || 0;
-                originalTop = parseFloat(style.top) || 0;
+                // Grab true calculated offset coordinates directly from offsetParent (bypasses Safari bug)
+                originalLeft = el.offsetLeft;
+                originalTop = el.offsetTop;
 
-                el.classList.add('shadow-2xl', 'scale-105');
-                // Prevent scrolling while interacting on mobile devices
+                el.classList.add('scale-105');
                 if (e.cancelable) e.preventDefault();
             }
 
@@ -478,7 +462,7 @@
             el.addEventListener('touchstart', handleStart, { passive: false });
         }
 
-        // Handle general dragging motion inside Playground
+        // Global Drag Event Listener
         function handleDragMove(e) {
             if (!activeDragElement) return;
 
@@ -490,11 +474,10 @@
             const containerRect = container.getBoundingClientRect();
             const elRect = activeDragElement.getBoundingClientRect();
 
-            // Calculate new positions inside bounding constraints
             let newLeft = originalLeft + dx;
             let newTop = originalTop + dy;
 
-            // Restrict positioning to playground canvas container
+            // Enforce boundary parameters inside playground
             const maxLeft = containerRect.width - elRect.width;
             const maxTop = containerRect.height - elRect.height;
             newLeft = Math.max(0, Math.min(newLeft, maxLeft));
@@ -508,17 +491,18 @@
             lastPointerX = coords.x;
             lastPointerY = coords.y;
 
-            // Trigger specific step collision processing
-            if (currentStage === 1 && activeDragElement.id === 'swab-stick') {
+            if (currentStage === 1 && activeDragElement.id === 'swab-stick-wrapper') {
                 processSwabCollision(dx, dy);
-            } else if (currentStage === 2 && activeDragElement.id === 'tube-swab') {
+            } else if (currentStage === 2 && activeDragElement.id === 'tube-swab-wrapper') {
                 processMixingCollision(dx, dy);
             }
+
+            if (e.cancelable) e.preventDefault();
         }
 
         function endGlobalDrag() {
             if (activeDragElement) {
-                activeDragElement.classList.remove('shadow-2xl', 'scale-105');
+                activeDragElement.classList.remove('scale-105');
                 activeDragElement = null;
             }
         }
@@ -528,6 +512,7 @@
         window.addEventListener('mouseup', endGlobalDrag);
         window.addEventListener('touchend', endGlobalDrag);
 
+        // Nose swabbing verification logic
         function processSwabCollision(dx, dy) {
             const swabTip = document.getElementById('swab-tip');
             const targetL = document.getElementById('hitbox-nostril-l');
@@ -540,7 +525,6 @@
 
             let isAnyContact = false;
 
-            // Handle Overlapping Left Nostril
             if (isOverL) {
                 visualL.setAttribute('fill', '#9c3d3d');
                 targetL.classList.remove('border-sky-400', 'glow-ring');
@@ -552,7 +536,6 @@
                 targetL.classList.remove('border-emerald-500', 'bg-emerald-50/40');
             }
 
-            // Handle Overlapping Right Nostril
             if (isOverR) {
                 visualR.setAttribute('fill', '#9c3d3d');
                 targetR.classList.remove('border-sky-400', 'glow-ring');
@@ -564,42 +547,41 @@
                 targetR.classList.remove('border-emerald-500', 'bg-emerald-50/40');
             }
 
-            // Accumulate progress only upon active movement inside nostrils
             if (isAnyContact) {
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance > 0.5) {
-                    swabProgressVal += distance * 0.28; // Standardized sensitivity
+                if (distance > 0.4) {
+                    swabProgressVal += distance * 0.4;
                     if (swabProgressVal > 100) swabProgressVal = 100;
                     
                     document.getElementById('sub-instruction').innerText = `Collecting Sample... (${Math.floor(swabProgressVal)}%)`;
 
-                    // Subtle bending wiggle effect while swabbing
-                    const rotDeg = Math.sin(swabProgressVal * 0.2) * 8;
+                    const rotDeg = Math.sin(swabProgressVal * 0.2) * 6;
                     activeDragElement.style.transform = `rotate(${rotDeg}deg)`;
                 }
             } else {
-                // If not in contact, stop progress accumulation
                 activeDragElement.style.transform = `rotate(0deg)`;
             }
 
             if (swabProgressVal >= 100) {
                 endGlobalDrag();
-                setTimeout(transitionToStage2, 600);
+                setTimeout(transitionToStage2, 500);
             }
         }
 
+        // Transition to Vial Solution stirring phase
         function transitionToStage2() {
             mixProgressVal = 0;
             showStage(2);
             
-            // Set Swab position to top-center of tube
-            const vialSwab = document.getElementById('tube-swab');
-            vialSwab.style.left = 'calc(50% - 6px)';
-            vialSwab.style.top = '15px';
+            // Adjust coordinates for the new wrapper size
+            const vialSwab = document.getElementById('tube-swab-wrapper');
+            vialSwab.style.left = 'calc(50% - 32px)';
+            vialSwab.style.top = '10px';
 
-            document.getElementById('sub-instruction').innerText = "Stir the swab stick inside the buffer solution.";
+            document.getElementById('sub-instruction').innerText = "Stir the swab stick inside the liquid.";
         }
 
+        // Swab mixing logic in buffer fluid
         function processMixingCollision(dx, dy) {
             const mixTip = document.getElementById('vial-swab-tip');
             const targetFluid = document.getElementById('hitbox-fluid');
@@ -612,16 +594,15 @@
                 targetFluid.classList.add('border-emerald-500');
 
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance > 0.5) {
-                    mixProgressVal += distance * 0.32; // Standardized sensitivity
+                if (distance > 0.4) {
+                    mixProgressVal += distance * 0.45;
                     if (mixProgressVal > 100) mixProgressVal = 100;
 
                     document.getElementById('sub-instruction').innerText = `Mixing Buffer... (${Math.floor(mixProgressVal)}%)`;
 
-                    // Rippling liquid physically bending based on drag intensity
-                    const tilt = Math.max(-18, Math.min(18, dx * 1.5));
+                    const tilt = Math.max(-12, Math.min(12, dx * 1.2));
                     activeDragElement.style.transform = `rotate(${tilt}deg)`;
-                    tubeFluid.style.transform = `skewX(${tilt * 0.5}deg) scaleY(${1 + Math.abs(dx) * 0.015})`;
+                    tubeFluid.style.transform = `skewX(${tilt * 0.4}deg) scaleY(${1 + Math.abs(dx) * 0.01})`;
                 }
             } else {
                 targetFluid.classList.add('border-blue-400', 'glow-ring');
@@ -632,61 +613,60 @@
 
             if (mixProgressVal >= 100) {
                 endGlobalDrag();
-                setTimeout(transitionToStage3, 600);
+                setTimeout(transitionToStage3, 500);
             }
         }
 
+        // Transition to Dropping Phase
         function transitionToStage3() {
             dropletsAdded = 0;
-            document.getElementById('drop-1').className = 'w-4 h-4 rounded-full bg-gray-300 border border-gray-400';
-            document.getElementById('drop-2').className = 'w-4 h-4 rounded-full bg-gray-300 border border-gray-400';
-            document.getElementById('drop-3').className = 'w-4 h-4 rounded-full bg-gray-300 border border-gray-400';
+            document.getElementById('drop-1').className = 'w-3 h-3 rounded-full bg-gray-300 border border-gray-400';
+            document.getElementById('drop-2').className = 'w-3 h-3 rounded-full bg-gray-300 border border-gray-400';
+            document.getElementById('drop-3').className = 'w-3 h-3 rounded-full bg-gray-300 border border-gray-400';
             
             showStage(3);
             document.getElementById('sub-instruction').innerText = "Apply buffer drops onto the cassette.";
         }
 
-        // Handle Droplet Squeezing
         document.getElementById('dripping-tube').addEventListener('click', () => {
             if (currentStage !== 3 || dropletsAdded >= targetDroplets) return;
             dropletsAdded++;
 
             const drop = document.getElementById('droplet');
-            drop.style.left = 'calc(50% - 8px)';
-            drop.style.top = '80px';
+            drop.style.left = 'calc(50% - 6px)';
+            drop.style.top = '60px';
             drop.style.opacity = '1';
 
-            // Fluid dropping animation
-            let posY = 80;
+            let posY = 60;
             const dropInterval = setInterval(() => {
-                posY += 8;
+                posY += 6;
                 drop.style.top = `${posY}px`;
-                if (posY >= 180) {
+                if (posY >= 130) {
                     clearInterval(dropInterval);
                     drop.style.opacity = '0';
                     
-                    document.getElementById(`drop-${dropletsAdded}`).className = 'w-4 h-4 rounded-full bg-blue-500 border border-blue-600 shadow-sm';
+                    document.getElementById(`drop-${dropletsAdded}`).className = 'w-3 h-3 rounded-full bg-blue-500 border border-blue-600 shadow-sm';
                     
-                    // Fill well cassette visual indicator
                     const wellFluid = document.getElementById('well-fluid');
                     wellFluid.style.height = `${(dropletsAdded / targetDroplets) * 100}%`;
 
                     if (dropletsAdded === targetDroplets) {
-                        setTimeout(advanceToReaction, 800);
+                        setTimeout(advanceToReaction, 600);
                     }
                 }
             }, 16);
         });
 
+        // Capillary development simulation (strip wicking)
         function advanceToReaction() {
             showStage(4);
-            document.getElementById('sub-instruction').innerText = "Antibodies are binding on the test strip.";
+            document.getElementById('sub-instruction').innerText = "Wicking in progress...";
             
             const front = document.getElementById('liquid-front');
             front.style.opacity = '1';
             front.classList.add('wicking-fluid');
 
-            const speed = 5000; // Unlocked standard 5s timing
+            const speed = 5000;
             const progress = document.getElementById('wick-progress');
             progress.style.width = '0%';
             
@@ -705,6 +685,7 @@
             requestAnimationFrame(stepProgress);
         }
 
+        // Final Results Display Screen
         function revealResults() {
             showStage(5);
             document.getElementById('sub-instruction').innerText = "Workflow complete. Read your result.";
@@ -720,38 +701,37 @@
                 cLine.style.opacity = '1';
                 tLine.style.opacity = '0.9';
 
-                badge.className = "inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm mb-4 bg-red-100 text-red-700";
+                badge.className = "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full font-bold text-xs mb-3 bg-red-100 text-red-700";
                 badgeText.innerText = "POSITIVE (+)";
-                badgeDot.className = "w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse";
-                desc.innerText = "The SARS-CoV-2 antigen was detected. Please isolate immediately, follow local safety guidance, and contact a healthcare professional.";
+                badgeDot.className = "w-2 h-2 rounded-full bg-red-600 animate-pulse";
+                desc.innerText = "Antigen detected. Isolate immediately, follow guidelines, and contact your clinical provider.";
 
-                // Spark celebration animation
                 startConfetti();
 
             } else if (chosenOutcome === 'negative') {
                 cLine.style.opacity = '1';
                 tLine.style.opacity = '0';
 
-                badge.className = "inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm mb-4 bg-green-100 text-green-700";
+                badge.className = "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full font-bold text-xs mb-3 bg-green-100 text-green-700";
                 badgeText.innerText = "NEGATIVE (-)";
-                badgeDot.className = "w-2.5 h-2.5 rounded-full bg-green-600";
-                desc.innerText = "No SARS-CoV-2 antigens were detected. However, if symptoms persist, please perform another test in 24-48 hours.";
+                badgeDot.className = "w-2 h-2 rounded-full bg-green-600";
+                desc.innerText = "No antigens detected. If you continue experiencing symptoms, perform another test in 24-48 hours.";
 
             } else {
                 const showOnlyTest = Math.random() > 0.5;
                 cLine.style.opacity = '0';
                 tLine.style.opacity = showOnlyTest ? '0.9' : '0';
 
-                badge.className = "inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm mb-4 bg-yellow-100 text-yellow-700";
+                badge.className = "inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full font-bold text-xs mb-3 bg-yellow-100 text-yellow-700";
                 badgeText.innerText = "INVALID (✖)";
-                badgeDot.className = "w-2.5 h-2.5 rounded-full bg-yellow-600";
-                desc.innerText = "The test is void because the control line (C) failed to appear. This is usually caused by insufficient swabbing or incomplete mixing. Please perform a new test.";
+                badgeDot.className = "w-2 h-2 rounded-full bg-yellow-600";
+                desc.innerText = "No control line (C) formed. This is caused by insufficient swabbing or incomplete buffer mixing.";
             }
         }
 
-        // Setup Drag Interactions on load
-        setupDragging('swab-stick', 'stage-1', processSwabCollision);
-        setupDragging('tube-swab', 'stage-2', processMixingCollision);
+        // Register interactive touch/mouse handlers on the new high-touch-surface wrappers
+        setupDragging('swab-stick-wrapper', 'stage-1');
+        setupDragging('tube-swab-wrapper', 'stage-2');
     </script>
 </body>
 </html>
